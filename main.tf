@@ -1,5 +1,8 @@
 locals {
   instance_count = length(var.private_route_table_ids)
+  # split each subnet into two routes
+  interface_cidrs = flatten([for i in range(local.instance_count) : ["0.0.0.0/1", "128.0.0.0/1"]])
+  interface_count = length(local.interface_cidrs)
 }
 
 resource "aws_security_group" "this" {
@@ -28,20 +31,20 @@ resource "aws_security_group_rule" "ingress_any" {
 }
 
 resource "aws_network_interface" "this" {
-  count = local.instance_count
+  count = local.interface_count
 
   security_groups   = [aws_security_group.this.id]
   subnet_id         = var.public_subnet
   source_dest_check = false
-  description       = "ENI for NAT instance ${var.name} on route table ${var.private_route_table_ids[count.index]}"
+  description       = "ENI for NAT instance ${var.name} on route table ${var.private_route_table_ids[ceil(count.index / 2)]}"
   tags              = local.common_tags
 }
 
 resource "aws_route" "this" {
-  count = local.instance_count
+  count = local.interface_count
 
-  route_table_id         = var.private_route_table_ids[count.index]
-  destination_cidr_block = "0.0.0.0/0"
+  route_table_id         = var.private_route_table_ids[ceil(count.index / 2)]
+  destination_cidr_block = local.interface_cidrs[count.index]
   network_interface_id   = aws_network_interface.this[count.index].id
 }
 
