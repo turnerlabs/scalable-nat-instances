@@ -1,6 +1,5 @@
 #!/bin/bash -x
 
-eni=""
 return_code=1
 
 
