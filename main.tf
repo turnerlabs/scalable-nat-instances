@@ -98,7 +98,7 @@ resource "aws_launch_template" "this" {
       write_files : concat([
         {
           path : "/opt/nat/runonce.sh",
-          content : templatefile("${path.module}/runonce.sh", { eni = "", sg_id = aws_security_group.this.id }),
+          content : templatefile("${path.module}/runonce.sh", { sg_id = aws_security_group.this.id }),
           permissions : "0755",
         },
         {

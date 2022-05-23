@@ -20,7 +20,7 @@ while [ $return_code -ne 0 ]; do
       --region "$(/opt/aws/bin/ec2-metadata -z  | sed 's/placement: \(.*\).$/\1/')" \
       --instance-id "$(/opt/aws/bin/ec2-metadata -i | cut -d' ' -f2)" \
       --device-index 1 \
-      --network-interface-id "${eni}"
+      --network-interface-id $eni
     return_code=$?
 done
 
