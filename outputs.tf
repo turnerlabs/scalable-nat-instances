@@ -3,10 +3,10 @@ output "eni_id" {
   value       = aws_network_interface.this.id
 }
 
-output "eni_private_ip" {
-  description = "Private IP of the ENI for the NAT instance"
+output "eni_private_ips" {
+  description = "Private IPs of the ENI for the NAT instance"
   # workaround of https://github.com/terraform-providers/terraform-provider-aws/issues/7522
-  value = tolist(aws_network_interface.this.private_ips)[0]
+  value = flatten([for i in aws_network_interface.this : tolist(i.private_ips)])
 }
 
 output "sg_id" {
