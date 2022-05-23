@@ -12,7 +12,7 @@ while [ $return_code -ne 0 ]; do
     # get the first (random) available interface
     eni=$(aws ec2 describe-network-interfaces \
       --region "$(/opt/aws/bin/ec2-metadata -z  | sed 's/placement: \(.*\).$/\1/')" \
-      --filters "Name=group-id,Values=${sg_id}" "Name=attachment.delete-on-termination,Values=false" "Name=status,Values=available" \
+      --filters "Name=group-id,Values=${sg_id}" "Name=status,Values=available" \
       --query 'NetworkInterfaces[0].NetworkInterfaceId')
 
     # attach the ENI
