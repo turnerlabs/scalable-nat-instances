@@ -1,6 +1,6 @@
-output "eni_id" {
-  description = "ID of the ENI for the NAT instance"
-  value       = aws_network_interface.this.id
+output "eni_ids" {
+  description = "List of ENI IDs for the NAT instances"
+  value       = [for i in aws_network_interface.this : i.id]
 }
 
 output "eni_private_ips" {
@@ -10,11 +10,11 @@ output "eni_private_ips" {
 }
 
 output "sg_id" {
-  description = "ID of the security group of the NAT instance"
+  description = "ID of the security group of the NAT instances"
   value       = aws_security_group.this.id
 }
 
 output "iam_role_name" {
-  description = "Name of the IAM role for the NAT instance"
+  description = "Name of the IAM role for the NAT instances"
   value       = aws_iam_role.this.name
 }
