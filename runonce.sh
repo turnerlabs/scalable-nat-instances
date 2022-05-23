@@ -13,7 +13,7 @@ while [ $return_code -ne 0 ]; do
     eni=$(aws ec2 describe-network-interfaces \
       --region "$(/opt/aws/bin/ec2-metadata -z  | sed 's/placement: \(.*\).$/\1/')" \
       --filters "Name=group-id,Values=${sg_id}" "Name=status,Values=available" \
-      --query 'NetworkInterfaces[0].NetworkInterfaceId')
+      --query 'NetworkInterfaces[0].NetworkInterfaceId' | tr -d '"')
 
     # attach the ENI
     aws ec2 attach-network-interface \
