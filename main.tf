@@ -1,3 +1,7 @@
+locals {
+  instance_count = length(var.private_route_table_ids)
+}
+
 resource "aws_security_group" "this" {
   name_prefix = var.name
   vpc_id      = var.vpc_id
@@ -24,18 +28,21 @@ resource "aws_security_group_rule" "ingress_any" {
 }
 
 resource "aws_network_interface" "this" {
+  count = local.instance_count
+
   security_groups   = [aws_security_group.this.id]
   subnet_id         = var.public_subnet
   source_dest_check = false
-  description       = "ENI for NAT instance ${var.name}"
+  description       = "ENI for NAT instance ${var.name} on route table ${var.private_route_table_ids[count.index]}"
   tags              = local.common_tags
 }
 
 resource "aws_route" "this" {
-  count                  = length(var.private_route_table_ids)
+  count = local.instance_count
+
   route_table_id         = var.private_route_table_ids[count.index]
   destination_cidr_block = "0.0.0.0/0"
-  network_interface_id   = aws_network_interface.this.id
+  network_interface_id   = aws_network_interface.this[count.index].id
 }
 
 # AMI of the latest Amazon Linux 2 
@@ -116,9 +123,9 @@ resource "aws_launch_template" "this" {
 
 resource "aws_autoscaling_group" "this" {
   name_prefix         = var.name
-  desired_capacity    = var.enabled ? 1 : 0
-  min_size            = var.enabled ? 1 : 0
-  max_size            = 1
+  desired_capacity    = var.enabled ? local.instance_count : 0
+  min_size            = var.enabled ? local.instance_count : 0
+  max_size            = local.instance_count
   vpc_zone_identifier = [var.public_subnet]
 
   mixed_instances_policy {
