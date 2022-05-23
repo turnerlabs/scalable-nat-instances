@@ -91,7 +91,7 @@ resource "aws_launch_template" "this" {
       write_files : concat([
         {
           path : "/opt/nat/runonce.sh",
-          content : templatefile("${path.module}/runonce.sh", { eni_id = aws_network_interface.this.id }),
+          content : templatefile("${path.module}/runonce.sh", { sg_id = aws_security_group.this.id }),
           permissions : "0755",
         },
         {
@@ -195,7 +195,8 @@ resource "aws_iam_role_policy" "eni" {
             "Effect": "Allow",
             "Action": [
                 "ec2:AttachNetworkInterface",
-                "ec2:ModifyInstanceAttribute"
+                "ec2:ModifyInstanceAttribute",
+                "ec2:DescribeNetworkInterfaces"
             ],
             "Resource": "*"
         }
