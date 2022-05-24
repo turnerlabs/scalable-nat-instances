@@ -25,6 +25,7 @@ for i in {1..2}; do
           --network-interface-id $eni
         return_code=$?
     done
+    return_code=1
 done
 
 
