@@ -45,7 +45,7 @@ variable "image_id" {
 variable "instance_types" {
   description = "Candidates of spot instance type for the NAT instance. This is used in the mixed instances policy"
   type        = list(any)
-  default     = ["t3.nano", "t3a.nano"]
+  default     = ["t3.medium", "t3a.medium"]
 }
 
 variable "use_spot_instance" {
