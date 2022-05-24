@@ -4,6 +4,12 @@ variable "enabled" {
   default     = true
 }
 
+variable "dry_run" {
+  description = "Use this flag for safely standing up resources without applying any route changes. Useful for transitioning existing environments from NAT Gateway."
+  type        = bool
+  default     = false
+}
+
 variable "name" {
   description = "Name for all the resources as identifier"
   type        = string

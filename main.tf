@@ -41,7 +41,7 @@ resource "aws_network_interface" "this" {
 }
 
 resource "aws_route" "this" {
-  count = local.interface_count
+  count = var.dry_run ? 0 : local.interface_count
 
   route_table_id         = var.private_route_table_ids[floor(count.index / 2)]
   destination_cidr_block = local.interface_cidrs[count.index]
