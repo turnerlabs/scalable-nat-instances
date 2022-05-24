@@ -37,7 +37,7 @@ resource "aws_network_interface" "this" {
   subnet_id         = var.public_subnet
   source_dest_check = false
   description       = "ENI for NAT instance ${var.name} on route table ${var.private_route_table_ids[floor(count.index / 2)]}"
-  tags              = local.common_tags
+  tags              = merge(local.common_tags, { "half" : count.index % 2 == 0 ? "lower" : "upper" })
 }
 
 resource "aws_route" "this" {
