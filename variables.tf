@@ -36,6 +36,12 @@ variable "private_route_table_ids" {
   default     = []
 }
 
+variable "routes" {
+  description = "List of CIDRs to break each private subnet into. Caution: this must not exceed the ENI capacity of the provisioned EC2 instance types."
+  type        = list(string)
+  default     = ["0.0.0.0/1", "128.0.0.0/1"]
+}
+
 variable "image_id" {
   description = "AMI of the NAT instance. Default to the latest Amazon Linux 2"
   type        = string
