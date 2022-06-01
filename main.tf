@@ -1,7 +1,7 @@
 locals {
   instance_count = length(var.private_route_table_ids)
   # split each subnet into two routes
-  interface_cidrs = flatten([for i in range(local.instance_count) : ["0.0.0.0/1", "128.0.0.0/1"]])
+  interface_cidrs = flatten([for i in range(local.instance_count) : var.routes])
   interface_count = length(local.interface_cidrs)
 }
 
@@ -36,14 +36,14 @@ resource "aws_network_interface" "this" {
   security_groups   = [aws_security_group.this.id]
   subnet_id         = var.public_subnet
   source_dest_check = false
-  description       = "ENI for NAT instance ${var.name} on route table ${var.private_route_table_ids[floor(count.index / 2)]}"
-  tags              = merge(local.common_tags, { "half" : count.index % 2 == 0 ? "lower" : "upper" })
+  description       = "ENI for NAT instance ${var.name} on route table ${var.private_route_table_ids[floor(count.index / length(var.routes))]}"
+  tags              = merge(local.common_tags, { "route" : var.routes[count.index % length(var.routes)] })
 }
 
 resource "aws_route" "this" {
   count = var.dry_run ? 0 : local.interface_count
 
-  route_table_id         = var.private_route_table_ids[floor(count.index / 2)]
+  route_table_id         = var.private_route_table_ids[floor(count.index / length(var.routes))]
   destination_cidr_block = local.interface_cidrs[count.index]
   network_interface_id   = aws_network_interface.this[count.index].id
 }
@@ -101,7 +101,11 @@ resource "aws_launch_template" "this" {
       write_files : concat([
         {
           path : "/opt/nat/runonce.sh",
-          content : templatefile("${path.module}/runonce.sh", { sg_id = aws_security_group.this.id }),
+          content : templatefile("${path.module}/runonce.sh", {
+            routes_count = length(var.routes),
+            sg_id        = aws_security_group.this.id,
+            tags         = format("(%s)", join(" ", var.routes))
+          }),
           permissions : "0755",
         },
         {
