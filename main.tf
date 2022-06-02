@@ -110,7 +110,9 @@ resource "aws_launch_template" "this" {
         },
         {
           path : "/opt/nat/snat.sh",
-          content : file("${path.module}/snat.sh"),
+          content : templatefile("${path.module}/snat.sh", {
+            routes_count = length(var.routes)
+          }),
           permissions : "0755",
         },
         {
