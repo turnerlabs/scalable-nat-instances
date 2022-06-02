@@ -17,7 +17,7 @@ for i in {1..${routes_count}}; do
         # get the first (random) available interface
         eni=$(aws ec2 describe-network-interfaces \
           --region "$region" \
-          --filters "Name=group-id,Values=${sg_id}" "Name=tag:route,Values=$${tags[i]}" "Name=status,Values=available" \
+          --filters "Name=group-id,Values=${sg_id}" "Name=tag:route,Values=$${tags[i-1]}" "Name=status,Values=available" \
           --query 'NetworkInterfaces[0].NetworkInterfaceId' | tr -d '"')
 
         # attach the ENI
