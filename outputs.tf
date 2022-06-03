@@ -1,3 +1,8 @@
+output "asg" {
+  description = "The Autoscaling Group provisioning NAT instances"
+  value       = aws_autoscaling_group.this
+}
+
 output "eni_ids" {
   description = "List of ENI IDs for the NAT instances"
   value       = [for i in aws_network_interface.this : i.id]
